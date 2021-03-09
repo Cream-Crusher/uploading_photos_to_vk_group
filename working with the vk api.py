@@ -2,35 +2,9 @@ import os
 import requests
 import json
 import random
-import time
 
 
-def комент():
-    url = 'http://xkcd.com/353/info.0.json'
-    response = requests.get(url)
-    response = response.json()['alt']
-
-
-def скачка_url(url):
-    filename = 'img/imq.png'
-    response = requests.get(url)
-
-    with open(filename, 'wb') as file:
-        file.write(response.content)
-
-
-def группы():
-    access_token = os.getenv('ACCESS_TOKEN')
-    payload = {
-            'access_token': access_token,
-            'extended': 1,
-            'v': '5.130'
-    }
-    response = requests.get('https://api.vk.com/method/groups.get?PARAMETERS', params=payload)
-    print(response.url)
-
-
-def доступ():#
+def getting_access():
     client_id = os.getenv('CLIENT_ID')
     payload = {
             'client_id' : client_id,
@@ -40,14 +14,12 @@ def доступ():#
             'v': 5.124,
             'state': 123456
     }
-
     response = requests.get('https://oauth.vk.com/authorize?', params=payload) 
     print(response.url)
 
 
-def адрес_для_загрузки():
+def getting_data_for_uploading_photos(access_token):
     url = 'https://api.vk.com/method/photos.getWallUploadServer?PARAMETERS'
-    access_token = os.getenv('ACCESS_TOKEN')
     payload = {
             'access_token': access_token,
             'extended': 1,
@@ -62,11 +34,8 @@ def адрес_для_загрузки():
     return data
 
 
-def загрузка_фото(data, filename):
-    entrance = 0
+def getting_comic_book(data, filename, access_token):
     url = data['upload_url']
-    group_id = '202809238'
-    access_token = os.getenv('ACCESS_TOKEN')
 
     with open(filename, 'rb') as file:
         files = {
@@ -86,21 +55,27 @@ def загрузка_фото(data, filename):
     }
     request = requests.post(url, params=params)
     result = json.loads(request.text)
+    return result
+
+
+def uploading_an_image_to_group(result, access_token):
+    group_id = '202809238'
+    entrance = 0
     url = 'https://api.vk.com/method/wall.post?PARAMETERS'
     params = {
         'access_token': access_token,
         'group_id': group_id,
         'owner_id': '-{}'.format(group_id),
         'from_group': 1,
-        'attachments': 'photo{}_{}'.format(result['response'][0]['owner_id'], result['response'][0]['id']),
-        'message': 'тест',
+        'attachments': 'photo{}_{}'.format(result['response'][entrance]['owner_id'],\
+        result['response'][entrance]['id']),
+        'message': 'тест1',
         'v':'5.130'
     }
-    request = requests.post(url, params=params)
-    print(request.url)
+    requests.post(url, params=params)
 
 
-def скачивание_рандомного_комикса():
+def getting_random_comic():
     num = random.randint(1, 2433)
     url = 'http://xkcd.com/{}/info.0.json'.format(num)
     filename = 'img/imq_{}.png'.format(num)
@@ -113,18 +88,10 @@ def скачивание_рандомного_комикса():
     return filename
 
 
-def удаление_картинки(filename):
-    time.sleep(1)
-    os.remove(filename) 
-
-
 if __name__ == '__main__':
     access_token = os.getenv('ACCESS_TOKEN')
-    filename = скачивание_рандомного_комикса()
-    #скачка_url(url)
-    #комент()
-    #доступ()
-    #группы()
-    data = адрес_для_загрузки()
-    загрузка_фото(data, filename)
-    удаление_картинки(filename)
+    filename = getting_random_comic()
+    data = getting_data_for_uploading_photos(access_token)
+    result = getting_comic_book(data, filename, access_token)
+    uploading_an_image_to_group(result, access_token)
+    os.remove(filename) 
