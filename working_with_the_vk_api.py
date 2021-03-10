@@ -56,7 +56,7 @@ def uploading_an_image_to_group(result, access_token):
         'from_group': 1,
         'attachments': 'photo{}_{}'.format(result['response'][entrance]['owner_id'],\
         result['response'][entrance]['id']),
-        'message': 'тест1',
+        'message': 'Комикс',
         'v':'5.130'
     }
     requests.post(url, params=params)
