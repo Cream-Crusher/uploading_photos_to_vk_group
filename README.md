@@ -4,6 +4,7 @@ Script for uploading comics to the VKontakte group
  
 # How to start
 
+create a folder 'img'
 Create a 'Standalone' application.
 Python3 should be already installed.
 hen use pip to install dependencies:
