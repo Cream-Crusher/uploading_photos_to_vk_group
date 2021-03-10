@@ -48,8 +48,9 @@ Use the file getting_access_to_group.py
 $ python getting_access_to_group.py
 ```
 
-In the console, you will see the URL link. Copy and paste it into your browser and click allow access.
-to get access_token, click on the link and copy your access_token
+In the console, you will see the URL link. Copy and paste it into your browser and click allow access. 
+To get access_token, click on the link and copy your access_token.
+
 [If you still have any questions](https://devman.org/qna/63/kak-poluchit-token-polzovatelja-dlja-vkontakte/)
 
 
