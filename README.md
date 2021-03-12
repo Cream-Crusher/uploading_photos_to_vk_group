@@ -10,7 +10,7 @@ Create a ['Standalone'](https://vk.com/editapp?act=create) application.
 
 Python3 should be already installed.
 
-hen use pip to install dependencies:
+Use pip to install dependencies:
 
 ```bash
 pip install -r requirements.txt
