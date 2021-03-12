@@ -1,18 +1,19 @@
 import os
 import requests
-import json
 import random
 from dotenv import load_dotenv
 
 
-def getting_data_for_uploading_photos(access_token):
-    url = 'https://api.vk.com/method/photos.getWallUploadServer?PARAMETERS'
+def get_data_for_uploading_photos(access_token):
+    url = 'https://api.vk.com/method/photos.getWallUploadServer?'
     payload = {
             'access_token': access_token,
             'extended': 1,
             'v': '5.130'
     }
-    response = requests.get(url, params=payload).json()
+    response = requests.get(url, params=payload)
+    response.raise_for_status()
+    response = response.json()
     data = {
         'upload_url': response['response']['upload_url'],
         'album_id': response['response']['album_id'],
@@ -21,17 +22,18 @@ def getting_data_for_uploading_photos(access_token):
     return data
 
 
-def getting_comic_book(data, filename, access_token):
+def get_comic_book(data, information_about_the_comic, access_token):
     url = data['upload_url']
 
-    with open(filename, 'rb') as file:
+    with open(information_about_the_comic['filename'], 'rb') as file:
         files = {
             'photo': file
         }
         response = requests.post(url, files=files)
-        result = json.loads(response.text)
+        response.raise_for_status()
+        result = response.json()
 
-    url = 'https://api.vk.com/method/photos.saveWallPhoto?PARAMETERS'
+    url = 'https://api.vk.com/method/photos.saveWallPhoto?'
     params = {
         'server': result['server'],
         'photo': result['photo'],
@@ -40,15 +42,16 @@ def getting_comic_book(data, filename, access_token):
         'v':'5.130',
         'caption': 'тест'
     }
-    request = requests.post(url, params=params)
-    result = json.loads(request.text)
+    response = requests.post(url, params=params)
+    response.raise_for_status()
+    result = response.json()
     return result
 
 
-def uploading_an_image_to_group(result, access_token):
+def send_an_image_to_group(result, access_token):
     group_id = '202809238'
     entrance = 0
-    url = 'https://api.vk.com/method/wall.post?PARAMETERS'
+    url = 'https://api.vk.com/method/wall.post?'
     params = {
         'access_token': access_token,
         'group_id': group_id,
@@ -62,24 +65,42 @@ def uploading_an_image_to_group(result, access_token):
     requests.post(url, params=params)
 
 
-def getting_random_comic():
-    num = random.randint(1, 2433)
+def get_information_about_the_comic():
+    try:
+        os.mkdir('img')
+    except:
+        print()
+
+    request = requests.get('https://xkcd.com//info.0.json')
+    request.raise_for_status()
+    number_comics = request.json()['num']
+    num = random.randint(1, number_comics)
     url = 'http://xkcd.com/{}/info.0.json'.format(num)
     filename = 'img/imq_{}.png'.format(num)
-    response = requests.get(url)
+    information_about_the_comic = {
+        'url': url,
+        'filename': filename
+    }
+    return information_about_the_comic
+
+
+def send_comic_to_group(information_about_the_comic):
+    response = requests.get(information_about_the_comic['url'])
+    response.raise_for_status()
     response = response.json()['img']
     response = requests.get(response)
+    response.raise_for_status()
 
-    with open(filename, 'wb') as file:
-       file.write(response.content)
-    return filename
+    with open(information_about_the_comic['filename'], 'wb') as file:
+        file.write(response.content)
 
 
 if __name__ == '__main__':
     load_dotenv()
     access_token = os.getenv('ACCESS_TOKEN')
-    filename = getting_random_comic()
-    data = getting_data_for_uploading_photos(access_token)
-    result = getting_comic_book(data, filename, access_token)
-    uploading_an_image_to_group(result, access_token)
-    os.remove(filename) 
+    information_about_the_comic = get_information_about_the_comic()
+    send_comic_to_group(information_about_the_comic)
+    data = get_data_for_uploading_photos(access_token)
+    result = get_comic_book(data, information_about_the_comic, access_token)
+    send_an_image_to_group(result, access_token)
+    os.remove(information_about_the_comic['filename'])

@@ -3,8 +3,7 @@ import requests
 from dotenv import load_dotenv
 
 
-def getting_access():
-    client_id = os.getenv('CLIENT_ID')
+def get_access(client_id):
     payload = {
             'client_id' : client_id,
             'display': 'page',
@@ -14,9 +13,11 @@ def getting_access():
             'state': 123456
     }
     response = requests.get('https://oauth.vk.com/authorize?', params=payload) 
+    response.raise_for_status()
     print(response.url)
 
 
 if __name__ == '__main__':
     load_dotenv()
-    getting_access()
+    client_id = os.getenv('CLIENT_ID')
+    get_access(client_id)
