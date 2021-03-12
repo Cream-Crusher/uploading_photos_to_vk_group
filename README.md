@@ -6,8 +6,6 @@ Script for uploading comics to the VKontakte group.
 
 Create a file .env.
 
-create a folder 'img'.
-
 Create a ['Standalone'](https://vk.com/editapp?act=create) application.
 
 Python3 should be already installed.
