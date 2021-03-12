@@ -21,7 +21,7 @@ pip install -r requirements.txt
 ### Environment variables
 
 - ACCESS_TOKEN
-- CLIENT_I
+- CLIENT_ID
 
 example .env:
 
