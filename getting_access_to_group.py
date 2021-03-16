@@ -1,6 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
+from checking_the_status_request import get_request_status
 
 
 def get_access(client_id):
@@ -12,8 +13,8 @@ def get_access(client_id):
             'v': 5.124,
             'state': 123456
     }
-    response = requests.get('https://oauth.vk.com/authorize?', params=payload) 
-    response.raise_for_status()
+    response = requests.get('https://oauth.vk.com/authorize?', params=payload)
+    get_request_status(response)
     print(response.url)
 
 
