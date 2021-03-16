@@ -20,6 +20,7 @@ pip install -r requirements.txt
 
 - ACCESS_TOKEN
 - CLIENT_ID
+- GROUP_ID
 
 example .env:
 
