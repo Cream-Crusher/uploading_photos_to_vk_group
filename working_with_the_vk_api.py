@@ -5,31 +5,13 @@ from dotenv import load_dotenv
 from checking_the_status_request import get_request_status
 
 
-def get_information_for_uploading_photos(access_token):
-    url = 'https://api.vk.com/method/photos.getWallUploadServer?'
-    payload = {
-            'access_token': access_token,
-            'extended': 1,
-            'v': '5.130'
-    }
-    response = requests.get(url, params=payload)
-    get_request_status(response)
-    response = response.json()
-    return {
-        'upload_url': response['response']['upload_url'],
-        'album_id': response['response']['album_id'],
-        'user_id': response['response']['user_id']
-        }
+def get_comic_book(upload_url, filename, access_token):
 
-
-def get_comic_book(information_for_uploading_photos, information_about_the_comic, access_token):
-    url = information_for_uploading_photos['upload_url']
-
-    with open(information_about_the_comic['filename'], 'rb') as file:
+    with open(filename, 'rb') as file:
         files = {
             'photo': file
         }
-        response = requests.post(url, files=files)
+        response = requests.post(upload_url, files=files)
         get_request_status(response)
         result = response.json()
 
@@ -67,37 +49,55 @@ def send_an_image_to_group(result, access_token, group_id):
 
 def get_information_about_random_comics():
     response = requests.get('https://xkcd.com//info.0.json')
-    get_request_status(response)
+    response.raise_for_status()
     number_comics = response.json()['num']
     num = random.randint(1, number_comics)
     url = 'http://xkcd.com/{}/info.0.json'.format(num)
     filename = 'img/imq_{}.png'.format(num)
-    return {
-        'url': url,
-        'filename': filename
-    }
+    return url, filename
 
 
-def save_image_the_catalog(information_about_the_comic):
-    response = requests.get(information_about_the_comic['url'])
+def save_xkcd_comics(url, falename):
+    response = requests.get(url)
     link_to_picture = response.json()['img']
-    url_pictures = requests.get(link_to_picture)
-    response = url_pictures
+    response = requests.get(link_to_picture)
+    response.raise_for_status()
+    with open(filename, 'wb') as file:
+        file.write(response.content)
+
+
+def get_request_status(response):
+    response = response.json()    
+    error_message = response['error']['error_code']
+    raise requests.HTTPError(error_message)
+
+
+
+def get_information_for_uploading_photos(access_token):
+    url = 'https://api.vk.com/method/photos.getWallUploadServer?'
+    payload = {
+            'access_token': access_token,
+            'extended': 1,
+            'v': '5.130'
+    }
+    response = requests.get(url, params=payload)
     get_request_status(response)
-    with open(information_about_the_comic['filename'], 'wb') as file:
-        file.write(url_pictures.content)
+    response = response.json()
+    return response['response']['upload_url']
 
 
 if __name__ == '__main__':
+    os.makedirs('img', exist_ok=True)
+    load_dotenv()
+    access_token = os.getenv('ACCESS_TOKEN')
+    group_id = os.getenv('GROUP_ID')
+    url, filename = get_information_about_random_comics()
+    save_xkcd_comics(url, filename)
+
     try:
-        os.makedirs('img', exist_ok=True)
-        load_dotenv()
-        access_token = os.getenv('ACCESS_TOKEN')
-        group_id = os.getenv('GROUP_ID')
-        information_about_the_comic = get_information_about_random_comics()
-        save_image_the_catalog(information_about_the_comic)
-        information_for_uploading_photos = get_information_for_uploading_photos(access_token)
-        result = get_comic_book(information_for_uploading_photos, information_about_the_comic, access_token)
+        upload_url = get_information_for_uploading_photos(access_token)
+        result = get_comic_book(upload_url, filename, access_token)
         send_an_image_to_group(result, access_token, group_id)
+
     finally:
-        os.remove(information_about_the_comic['filename'])
+        os.remove(filename)
