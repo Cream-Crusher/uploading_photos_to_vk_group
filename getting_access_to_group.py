@@ -1,7 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
-from checking_the_status_request import get_request_status
+from working_with_the_vk_api import get_request_status
 
 
 def get_access(client_id):
@@ -16,9 +16,15 @@ def get_access(client_id):
     response = requests.get('https://oauth.vk.com/authorize?', params=payload)
     get_request_status(response)
     print(response.url)
+    return response
 
 
 if __name__ == '__main__':
     load_dotenv()
     client_id = os.getenv('CLIENT_ID')
-    get_access(client_id)
+
+    try:
+        get_access(client_id)
+
+    except KeyError:
+        get_request_status(response)

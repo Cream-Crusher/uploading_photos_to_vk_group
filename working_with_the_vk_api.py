@@ -2,7 +2,6 @@ import os
 import requests
 import random
 from dotenv import load_dotenv
-from checking_the_status_request import get_request_status
 
 
 def get_comic_book(upload_url, filename, access_token):
@@ -27,7 +26,7 @@ def get_comic_book(upload_url, filename, access_token):
     response = requests.post(url, params=params)
     get_request_status(response)
     result = response.json()
-    return result
+    return response, result
 
 
 def send_an_image_to_group(result, access_token, group_id):
@@ -67,10 +66,9 @@ def save_xkcd_comics(url, falename):
 
 
 def get_request_status(response):
-    response = response.json()    
-    error_message = response['error']['error_code']
-    raise requests.HTTPError(error_message)
-
+    response_details = response.json()
+    if response_details.get('error'):
+        raise requests.HTTPError(response_details['error']['error_code'])
 
 
 def get_information_for_uploading_photos(access_token):
@@ -83,7 +81,7 @@ def get_information_for_uploading_photos(access_token):
     response = requests.get(url, params=payload)
     get_request_status(response)
     response = response.json()
-    return response['response']['upload_url']
+    return response, response['response']['upload_url']
 
 
 if __name__ == '__main__':
@@ -95,9 +93,12 @@ if __name__ == '__main__':
     save_xkcd_comics(url, filename)
 
     try:
-        upload_url = get_information_for_uploading_photos(access_token)
-        result = get_comic_book(upload_url, filename, access_token)
+        response, upload_url = get_information_for_uploading_photos(access_token)
+        response, result = get_comic_book(upload_url, filename, access_token)
         send_an_image_to_group(result, access_token, group_id)
+
+    except KeyError:
+        get_request_status(response)
 
     finally:
         os.remove(filename)
