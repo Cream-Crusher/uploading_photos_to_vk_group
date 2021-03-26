@@ -14,17 +14,13 @@ def get_access(client_id):
             'state': 123456
     }
     response = requests.get('https://oauth.vk.com/authorize?', params=payload)
-    get_request_status(response)
+    response_details = response.json()
+    get_request_status(response_details)
     print(response.url)
-    return response
 
 
 if __name__ == '__main__':
     load_dotenv()
     client_id = os.getenv('CLIENT_ID')
+    get_access(client_id)
 
-    try:
-        get_access(client_id)
-
-    except KeyError:
-        get_request_status(response)
