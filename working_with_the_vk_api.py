@@ -86,17 +86,17 @@ if __name__ == '__main__':
     os.makedirs('img', exist_ok=True)
     load_dotenv()
     entrance = 0
-    access_token = os.getenv('ACCESS_TOKEN')
-    group_id = os.getenv('GROUP_ID')
+    access_token_vk = os.getenv('ACCESS_TOKEN')
+    group_id_vk = os.getenv('GROUP_ID')
     url, filename = get_information_about_random_comics()
     save_xkcd_comics(url, filename)
 
     try:
-        upload_url = get_information_for_uploading_photos(access_token)
-        result = get_comic_book(upload_url, filename, access_token)
+        upload_url = get_information_for_uploading_photos(access_token_vk)
+        result = get_comic_book(upload_url, filename, access_token_vk)
         owner_id = result['response'][entrance]['owner_id']
-        id = result['response'][entrance]['id']
-        send_an_image_to_group(owner_id, id, access_token, group_id)
+        comic_id = result['response'][entrance]['id']
+        send_an_image_to_group(owner_id, comic_id, access_token_vk, group_id_vk)
 
     finally:
         os.remove(filename)

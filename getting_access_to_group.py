@@ -23,4 +23,3 @@ if __name__ == '__main__':
     load_dotenv()
     client_id = os.getenv('CLIENT_ID')
     get_access(client_id)
-
