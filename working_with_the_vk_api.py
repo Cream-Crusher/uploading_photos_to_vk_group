@@ -29,7 +29,7 @@ def get_comic_book(upload_url, filename, access_token):
     return response_details
 
 
-def send_an_image_to_group(owner_id, id, access_token, group_id):
+def send_an_image_to_group(owner_id, comic_id, access_token, group_id):
     url = 'https://api.vk.com/method/wall.post?'
     params = {
         'access_token': access_token,
@@ -38,7 +38,7 @@ def send_an_image_to_group(owner_id, id, access_token, group_id):
         'from_group': 1,
         'attachments': 'photo{}_{}'.format(
             owner_id,
-            id),
+            comic_id),
         'message': 'Комикс',
         'v': '5.130'
     }
@@ -86,17 +86,17 @@ if __name__ == '__main__':
     os.makedirs('img', exist_ok=True)
     load_dotenv()
     entrance = 0
-    access_token_vk = os.getenv('ACCESS_TOKEN')
-    group_id_vk = os.getenv('GROUP_ID')
+    access_token = os.getenv('VK_ACCESS_TOKEN')
+    group_id = os.getenv('VK_GROUP_ID')
     url, filename = get_information_about_random_comics()
     save_xkcd_comics(url, filename)
 
     try:
-        upload_url = get_information_for_uploading_photos(access_token_vk)
-        result = get_comic_book(upload_url, filename, access_token_vk)
+        upload_url = get_information_for_uploading_photos(access_token)
+        result = get_comic_book(upload_url, filename, access_token)
         owner_id = result['response'][entrance]['owner_id']
         comic_id = result['response'][entrance]['id']
-        send_an_image_to_group(owner_id, comic_id, access_token_vk, group_id_vk)
+        send_an_image_to_group(owner_id, comic_id, access_token, group_id)
 
     finally:
         os.remove(filename)
