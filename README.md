@@ -18,9 +18,8 @@ pip install -r requirements.txt
 
 ### Environment variables
 
-- ACCESS_TOKEN
-- CLIENT_ID
-- GROUP_ID
+- VK_ACCESS_TOKEN
+- VK_GROUP_ID
 
 example .env:
 
