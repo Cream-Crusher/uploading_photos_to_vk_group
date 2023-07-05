@@ -34,11 +34,11 @@ ACCESS_TOKEN=5607b93462c0a7e6b07d4e1892493e92d13c94e2391f80131edf0853c1e05b29e96
 $ python working_with_the_vk_api.py.py
 ```
 
-# You will see
+## You will see
 
 Comics in the group.
 
-# If there are no required group permissions or there is a problem with getting ACCESS_TOKEN
+### If there are no required group permissions or there is a problem with getting ACCESS_TOKEN
 
 Use the file getting_access_to_group.py
 
@@ -53,6 +53,6 @@ To get access_token, click on the link and copy your access_token.
 [If you still have any questions](https://devman.org/qna/63/kak-poluchit-token-polzovatelja-dlja-vkontakte/).
 
 
-# Project Goals
+### Project Goals
 
 The code is written for educational purposes. Training course for web-developers - [DEVMAN.org](https://devman.org).
